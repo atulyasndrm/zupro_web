@@ -8,14 +8,16 @@ import {
   RiArrowRightLine,
   RiCloseLine,
 } from 'react-icons/ri'
+import { useLanguage } from '../../i18n/language'
 
 type OnboardingModalProps = {
-  seekerPerks: string[]
-  hirerPerks: string[]
+  seekerPerks: readonly string[]
+  hirerPerks: readonly string[]
 }
 
 export function OnboardingModal({ seekerPerks, hirerPerks }: OnboardingModalProps) {
   const navigate = useNavigate()
+  const { t } = useLanguage()
   const [isModalOpen, setIsModalOpen] = useState(true)
   const [hoveredCard, setHoveredCard] = useState<'seeker' | 'hirer' | null>(null)
   const closeModal = () => setIsModalOpen(false)
@@ -74,11 +76,11 @@ export function OnboardingModal({ seekerPerks, hirerPerks }: OnboardingModalProp
                 <div className="flex items-center gap-2 mb-1">
                   <HiOutlineSparkles className="text-[#3F51B5]" size={18} />
                   <p className="text-sm font-semibold text-[#3F51B5] tracking-widest uppercase">
-                    Welcome to Zupro
+                    {t.home.modal.welcome}
                   </p>
                 </div>
                 <h2 className="text-[15px] dosis-semibold sm:text-md sm:text-xl md:text-2xl font-extrabold text-slate-800 leading-snug">
-                  How would you like to get started?
+                  {t.home.modal.heading}
                 </h2>
               </div>
 
@@ -92,7 +94,7 @@ export function OnboardingModal({ seekerPerks, hirerPerks }: OnboardingModalProp
                   onHoverEnd={() => setHoveredCard(null)}
                 >
                   <div className="flex flex-row gap-1 items-center mb-1">
-                    <h3 className="text-base sora-bold md:text-lg font-extrabold text-slate-800">Find a job</h3>
+                    <h3 className="text-base sora-bold md:text-lg font-extrabold text-slate-800">{t.home.modal.seekerTitle}</h3>
                     <motion.div
                       className="w-8 h-8 flex items-center justify-center"
                       whileHover={{ scale: 1.08, rotate: -4 }}
@@ -103,7 +105,7 @@ export function OnboardingModal({ seekerPerks, hirerPerks }: OnboardingModalProp
                   </div>
 
                   <p className="text-slate-500 sora-semibold text-sm leading-relaxed mb-4">
-                    Browse hundreds of daily jobs near you.
+                    {t.home.modal.seekerSubtitle}
                   </p>
 
                   {/* Perks — desktop */}
@@ -137,7 +139,7 @@ export function OnboardingModal({ seekerPerks, hirerPerks }: OnboardingModalProp
                     whileTap={{ scale: 0.97 }}
                     onClick={() => handleRoleSelect('/onboarding/seeker')}
                   >
-                    Search Jobs
+                    {t.home.modal.seekerButton}
                     <motion.span
                       animate={hoveredCard === 'seeker' ? { x: 4 } : { x: 0 }}
                       transition={{ duration: 0.2 }}
@@ -154,7 +156,7 @@ export function OnboardingModal({ seekerPerks, hirerPerks }: OnboardingModalProp
                   onHoverEnd={() => setHoveredCard(null)}
                 >
                   <div className="flex flex-row gap-1 items-center mb-1">
-                    <h3 className="text-base sora-bold md:text-lg font-extrabold text-slate-800">Hire</h3>
+                    <h3 className="text-base sora-bold md:text-lg font-extrabold text-slate-800">{t.home.modal.hirerTitle}</h3>
                     <motion.div
                       className="w-8 h-8 flex items-center justify-center"
                       whileHover={{ scale: 1.08, rotate: -4 }}
@@ -165,7 +167,7 @@ export function OnboardingModal({ seekerPerks, hirerPerks }: OnboardingModalProp
                   </div>
 
                   <p className="text-slate-500 sora-semibold text-sm leading-relaxed mb-4">
-                    Hire quickly. No more waiting !
+                    {t.home.modal.hirerSubtitle}
                   </p>
 
                   {/* Perks — desktop */}
@@ -199,7 +201,7 @@ export function OnboardingModal({ seekerPerks, hirerPerks }: OnboardingModalProp
                     whileTap={{ scale: 0.97 }}
                     onClick={() => handleRoleSelect('/onboarding/employer')}
                   >
-                    Proceed to Hire
+                    {t.home.modal.hirerButton}
                     <motion.span
                       animate={hoveredCard === 'hirer' ? { x: 4 } : { x: 0 }}
                       transition={{ duration: 0.2 }}

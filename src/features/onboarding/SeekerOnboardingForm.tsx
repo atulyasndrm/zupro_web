@@ -6,6 +6,7 @@ import {
 } from 'react-icons/fi'
 import { PiGenderIntersexBold } from 'react-icons/pi'
 import { motion, AnimatePresence } from 'framer-motion'
+import { useLanguage } from '../i18n/language'
 
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -17,24 +18,6 @@ interface FormData {
   location: string
   education: string
 }
-
-// ─── Constants ────────────────────────────────────────────────────────────────
-const GENDERS = ['Male', 'Female', 'Non-binary', 'Prefer not to say']
-
-const PROFESSIONS = [
-  'Software Engineer', 'Frontend Developer', 'Backend Developer', 'Full Stack Developer',
-  'UI/UX Designer', 'Product Manager', 'Data Analyst', 'Data Scientist',
-  'DevOps Engineer', 'QA Engineer', 'Business Analyst', 'Marketing Manager',
-  'Sales Executive', 'HR Manager', 'Content Writer', 'Graphic Designer',
-  'Operations Manager', 'Finance Analyst', 'Customer Support', 'Project Manager',
-  'Accountant', 'Teacher / Educator', 'Healthcare Worker', 'Legal Professional',
-  'Freelancer', 'Student', 'Other',
-]
-
-const EDUCATION_OPTIONS = [
-  '10th Pass', '12th Pass', 'Diploma', 'ITI',
-  'Graduate', 'Post Graduate', 'PhD', 'Other',
-]
 
 const FIELDS: (keyof FormData)[] = ['name', 'age', 'gender', 'profession', 'location', 'education']
 
@@ -108,6 +91,8 @@ function SearchDropdown({
   placeholder,
   icon,
   subLabel,
+  searchPlaceholder,
+  noResultsText,
 }: {
   options: string[]
   value: string
@@ -115,6 +100,8 @@ function SearchDropdown({
   placeholder: string
   icon: React.ReactNode
   subLabel?: string
+  searchPlaceholder: string
+  noResultsText: string
 }) {
   const [open, setOpen] = useState(false)
   const [query, setQuery] = useState('')
@@ -170,14 +157,14 @@ function SearchDropdown({
                 type="text"
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
-                placeholder="Search…"
+                placeholder={searchPlaceholder}
                 className="flex-1 text-sm outline-none bg-transparent placeholder-slate-400 text-slate-700"
                 onClick={(e) => e.stopPropagation()}
               />
             </div>
             <div className="max-h-48 overflow-y-auto zupro-scroll">
               {filtered.length === 0 ? (
-                <div className="px-4 py-3 text-sm text-slate-400">No results</div>
+                <div className="px-4 py-3 text-sm text-slate-400">{noResultsText}</div>
               ) : (
                 filtered.map((opt) => (
                   <button
@@ -268,6 +255,7 @@ function SimpleDropdown({
 // ─── Main Page ────────────────────────────────────────────────────────────────
 export function SeekerOnboardingForm() {
   const navigate = useNavigate()
+  const { t } = useLanguage()
 
   const [form, setForm] = useState<FormData>({
     name: '', age: '', gender: '', profession: '', location: '', education: '',
@@ -312,22 +300,22 @@ export function SeekerOnboardingForm() {
           {/* Hero text */}
           <div>
             <h2 className="text-white text-3xl font-bold leading-snug mb-4">
-              Let's get<br />you started!
+              {t.onboarding.seeker.title}
             </h2>
             <p className="text-indigo-200 text-sm leading-relaxed">
-              Please fill in a few details to find your next job. We are here to make your job search easy &amp; quick.
+              {t.onboarding.seeker.subtitle}
             </p>
             <p className="mt-6 text-indigo-300 text-sm">
-              Already with us?{' '}
+              {t.onboarding.seeker.alreadyWithUs}{' '}
               <a href="/auth" className="text-white underline underline-offset-2 font-medium hover:text-amber-300 transition-colors">
-                Sign in
+                {t.onboarding.seeker.signIn}
               </a>
             </p>
           </div>
 
           {/* Footer */}
           <div>
-            <p className="text-indigo-300 text-xs">Need help?</p>
+            <p className="text-indigo-300 text-xs">{t.onboarding.seeker.needHelp}</p>
             <p className="text-amber-400 text-sm font-semibold mt-0.5">help@zupro.in</p>
           </div>
         </div>
@@ -340,7 +328,7 @@ export function SeekerOnboardingForm() {
             <ProgressDots progress={progress} />
           </div>
 
-          <h3 className="text-xl font-bold text-slate-800 mb-5">Your Information</h3>
+          <h3 className="text-xl font-bold text-slate-800 mb-5">{t.onboarding.seeker.sectionTitle}</h3>
 
           <div className="flex flex-col gap-3 flex-1">
 
@@ -350,7 +338,7 @@ export function SeekerOnboardingForm() {
                 type="text"
                 value={form.name}
                 onChange={(e) => set('name')(e.target.value)}
-                placeholder="name"
+                placeholder={t.onboarding.seeker.placeholders.name}
                 className="w-full px-3 py-3.5 text-sm text-slate-800 placeholder-slate-400 bg-transparent outline-none"
               />
             </FieldBox>
@@ -363,27 +351,29 @@ export function SeekerOnboardingForm() {
                 max={65}
                 value={form.age}
                 onChange={(e) => set('age')(e.target.value)}
-                placeholder="age"
+                placeholder={t.onboarding.seeker.placeholders.age}
                 className="w-full px-3 py-3.5 text-sm text-slate-800 placeholder-slate-400 bg-transparent outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
               />
             </FieldBox>
 
             {/* Gender */}
             <SimpleDropdown
-              options={GENDERS}
+              options={[...t.onboarding.seeker.options.genders]}
               value={form.gender}
               onChange={set('gender')}
-              placeholder="Gender"
+              placeholder={t.onboarding.seeker.placeholders.gender}
               icon={<PiGenderIntersexBold size={16} />}
             />
 
             {/* Profession */}
             <SearchDropdown
-              options={PROFESSIONS}
+              options={[...t.onboarding.seeker.options.professions]}
               value={form.profession}
               onChange={set('profession')}
-              placeholder="What do you do?"
-              subLabel="Select your profession"
+              placeholder={t.onboarding.seeker.placeholders.profession}
+              subLabel={t.onboarding.seeker.placeholders.professionSubLabel}
+              searchPlaceholder={t.onboarding.seeker.placeholders.search}
+              noResultsText={t.onboarding.seeker.placeholders.noResults}
               icon={<FiSearch size={16} />}
             />
 
@@ -393,18 +383,20 @@ export function SeekerOnboardingForm() {
                 type="text"
                 value={form.location}
                 onChange={(e) => set('location')(e.target.value)}
-                placeholder="Current location (e.g. Mumbai, Maharashtra)"
+                placeholder={t.onboarding.seeker.placeholders.location}
                 className="w-full px-3 py-3.5 text-sm text-slate-800 placeholder-slate-400 placeholder:text-[13px] bg-transparent outline-none"
               />
             </FieldBox>
 
             {/* Education */}
             <SearchDropdown
-              options={EDUCATION_OPTIONS}
+              options={[...t.onboarding.seeker.options.education]}
               value={form.education}
               onChange={set('education')}
-              placeholder="Education"
-              subLabel="Select your qualification"
+              placeholder={t.onboarding.seeker.placeholders.education}
+              subLabel={t.onboarding.seeker.placeholders.educationSubLabel}
+              searchPlaceholder={t.onboarding.seeker.placeholders.search}
+              noResultsText={t.onboarding.seeker.placeholders.noResults}
               icon={<FiBookOpen size={16} />}
             />
 
@@ -422,7 +414,7 @@ export function SeekerOnboardingForm() {
                 : 'bg-slate-300 cursor-not-allowed'
             }`}
           >
-            Continue
+            {t.onboarding.seeker.continue}
             <FiArrowRight size={18} />
           </motion.button>
 

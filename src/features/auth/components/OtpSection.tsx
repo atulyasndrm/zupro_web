@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, useState, type ChangeEvent, type ClipboardEvent, type KeyboardEvent } from 'react'
+import { useLanguage } from '../../i18n/language'
 
 type OtpSectionProps = {
   phone: string
@@ -18,6 +19,7 @@ function OtpCell({
   onKeyDown,
   onPaste,
   onFocus,
+  ariaLabel,
 }: {
   value: string
   index: number
@@ -28,6 +30,7 @@ function OtpCell({
   onKeyDown: (e: KeyboardEvent<HTMLInputElement>) => void
   onPaste: (e: ClipboardEvent<HTMLInputElement>) => void
   onFocus: (index: number) => void
+  ariaLabel: string
 }) {
   const base =
     'w-full h-14 text-center text-xl font-bold rounded-xl border-2 outline-none transition-all duration-200 bg-slate-50 caret-transparent otp-font'
@@ -52,7 +55,7 @@ function OtpCell({
         onKeyDown={onKeyDown}
         onPaste={onPaste}
         onFocus={() => onFocus(index)}
-        aria-label={`OTP digit ${index + 1}`}
+        aria-label={ariaLabel}
         className={`${base} ${state}`}
       />
       {value && !isFocused && (
@@ -75,11 +78,21 @@ function OtpProgress({ filled }: { filled: number }) {
   )
 }
 
-function ResendTimer({ seconds, onResend }: { seconds: number; onResend: () => void }) {
+function ResendTimer({
+  seconds,
+  onResend,
+  resendInPrefix,
+  resendOtp,
+}: {
+  seconds: number
+  onResend: () => void
+  resendInPrefix: string
+  resendOtp: string
+}) {
   if (seconds > 0) {
     return (
       <p className="text-sm text-slate-500 text-center">
-        Resend OTP in <span className="font-semibold text-primary">{seconds}s</span>
+        {resendInPrefix} <span className="font-semibold text-primary">{seconds}s</span>
       </p>
     )
   }
@@ -89,12 +102,13 @@ function ResendTimer({ seconds, onResend }: { seconds: number; onResend: () => v
       onClick={onResend}
       className="w-full text-sm text-center text-primary font-semibold hover:underline underline-offset-2"
     >
-      Resend OTP
+      {resendOtp}
     </button>
   )
 }
 
 export function OtpSection({ phone, onBack, onVerified }: OtpSectionProps) {
+  const { t } = useLanguage()
   const [otp, setOtp] = useState<string[]>(Array(OTP_LENGTH).fill(''))
   const [focusedIndex, setFocusedIndex] = useState(0)
   const [isOtpError, setIsOtpError] = useState(false)
@@ -258,15 +272,15 @@ export function OtpSection({ phone, onBack, onVerified }: OtpSectionProps) {
           >
             <polyline points="15 18 9 12 15 6" />
           </svg>
-          Back
+          {t.auth.otp.back}
         </button>
         <div className="flex-1 h-px bg-slate-100" />
         <span className="text-xs text-slate-400 font-medium">+91 {phone}</span>
       </div>
 
       <p className="text-sm text-slate-500 mb-5 leading-relaxed">
-        We sent a 6-digit OTP to your number. It expires in{' '}
-        <span className="font-semibold text-slate-700">5 minutes</span>.
+        {t.auth.otp.sentMessagePrefix}{' '}
+        <span className="font-semibold text-slate-700">{t.auth.otp.sentMessageExpiry}</span>.
       </p>
 
       <div className="flex gap-2 mb-1">
@@ -277,6 +291,7 @@ export function OtpSection({ phone, onBack, onVerified }: OtpSectionProps) {
             index={i}
             isFocused={focusedIndex === i}
             isError={isOtpError}
+            ariaLabel={`${t.auth.otp.otpDigitAriaPrefix} ${i + 1}`}
             inputRef={(el) => {
               inputRefs.current[i] = el
             }}
@@ -292,7 +307,7 @@ export function OtpSection({ phone, onBack, onVerified }: OtpSectionProps) {
 
       {isOtpError && (
         <p className="text-xs text-red-500 font-medium mt-3 text-center">
-          Invalid OTP. Please try again.
+          {t.auth.otp.invalidOtp}
         </p>
       )}
 
@@ -315,11 +330,11 @@ export function OtpSection({ phone, onBack, onVerified }: OtpSectionProps) {
             >
               <path d="M12 2a10 10 0 0 1 10 10" />
             </svg>
-            Verifying...
+            {t.auth.otp.verifying}
           </>
         ) : (
           <>
-            Verify & Continue
+            {t.auth.otp.verifyAndContinue}
             <svg
               width="16"
               height="16"
@@ -337,7 +352,12 @@ export function OtpSection({ phone, onBack, onVerified }: OtpSectionProps) {
       </button>
 
       <div className="mt-4">
-        <ResendTimer seconds={resendSeconds} onResend={handleResend} />
+        <ResendTimer
+          seconds={resendSeconds}
+          onResend={handleResend}
+          resendInPrefix={t.auth.otp.resendInPrefix}
+          resendOtp={t.auth.otp.resendOtp}
+        />
       </div>
     </div>
   )

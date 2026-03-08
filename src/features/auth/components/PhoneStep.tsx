@@ -1,5 +1,6 @@
 import { Link } from '@tanstack/react-router'
 import type { RefObject } from 'react'
+import { useLanguage } from '../../i18n/language'
 
 type PhoneStepProps = {
   phone: string
@@ -18,6 +19,8 @@ export function PhoneStep({
   onPhoneChange,
   onSendOtp,
 }: PhoneStepProps) {
+  const { t } = useLanguage()
+
   return (
     <div className="fade-up">
       <div className="phone-field mb-4">
@@ -30,7 +33,7 @@ export function PhoneStep({
           ref={phoneInputRef}
           type="tel"
           inputMode="numeric"
-          placeholder="Enter mobile number"
+          placeholder={t.auth.phone.placeholder}
           value={phone}
           maxLength={10}
           onChange={(e) => onPhoneChange(e.target.value.replace(/\D/g, '').slice(0, 10))}
@@ -77,11 +80,11 @@ export function PhoneStep({
             >
               <path d="M12 2a10 10 0 0 1 10 10" />
             </svg>
-            Sending OTP...
+            {t.auth.phone.sendingOtp}
           </>
         ) : (
           <>
-            Get OTP
+            {t.auth.phone.getOtp}
             <svg
               width="16"
               height="16"
@@ -100,13 +103,13 @@ export function PhoneStep({
       </button>
 
       <p className="text-xs text-slate-400 text-center mt-5 leading-relaxed">
-        By continuing, you agree to our{' '}
+        {t.auth.phone.termsPrefix}{' '}
         <Link to="/" className="text-primary font-medium hover:underline">
-          Terms of Service
+          {t.auth.phone.terms}
         </Link>
         {' '}&{' '}
         <Link to="/" className="text-primary font-medium hover:underline">
-          Privacy Policy
+          {t.auth.phone.privacy}
         </Link>
       </p>
     </div>

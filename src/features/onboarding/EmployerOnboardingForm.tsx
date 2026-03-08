@@ -6,6 +6,7 @@ import {
   FiBriefcase,
 } from 'react-icons/fi'
 import { motion, AnimatePresence } from 'framer-motion'
+import { useLanguage } from '../i18n/language'
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 interface FormData {
@@ -17,21 +18,6 @@ interface FormData {
   payType: 'monthly' | 'yearly'
   educationLevel: string
 }
-
-// ─── Constants ────────────────────────────────────────────────────────────────
-const EDUCATION_LEVELS = [
-  '10th Pass', '12th Pass', 'Graduate', 'Post Graduate', 'Other', 'Prefer not to say',
-]
-
-const JOB_TITLES = [
-  'Software Engineer', 'Frontend Developer', 'Backend Developer', 'Full Stack Developer',
-  'UI/UX Designer', 'Product Manager', 'Data Analyst', 'Data Scientist',
-  'DevOps Engineer', 'QA Engineer', 'Business Analyst', 'Marketing Manager',
-  'Sales Executive', 'HR Manager', 'Content Writer', 'Graphic Designer',
-  'Operations Manager', 'Finance Analyst', 'Customer Support', 'Project Manager',
-  'Accountant', 'Teacher / Educator', 'Healthcare Worker', 'Legal Professional',
-  'Delivery Executive', 'Store Manager', 'Field Agent', 'Other',
-]
 
 const REQUIRED_FIELDS: (keyof FormData)[] = [
   'employerName', 'jobTitle', 'jobDescription', 'jobLocation', 'educationLevel',
@@ -92,9 +78,10 @@ function FieldBox({ children, icon, noPadIcon }: {
 }
 
 // ─── Searchable Dropdown ──────────────────────────────────────────────────────
-function SearchDropdown({ options, value, onChange, placeholder, icon, subLabel }: {
+function SearchDropdown({ options, value, onChange, placeholder, icon, subLabel, searchPlaceholder, noResultsText }: {
   options: string[]; value: string; onChange: (v: string) => void
   placeholder: string; icon: React.ReactNode; subLabel?: string
+  searchPlaceholder: string; noResultsText: string
 }) {
   const [open, setOpen] = useState(false)
   const [query, setQuery] = useState('')
@@ -147,13 +134,13 @@ function SearchDropdown({ options, value, onChange, placeholder, icon, subLabel 
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
                 onClick={(e) => e.stopPropagation()}
-                placeholder="Search…"
+                placeholder={searchPlaceholder}
                 className="flex-1 text-sm outline-none bg-transparent placeholder-slate-400 text-slate-700"
               />
             </div>
             <div className="max-h-36 overflow-y-auto zupro-scroll">
               {filtered.length === 0
-                ? <div className="px-4 py-3 text-sm text-slate-400">No results</div>
+                ? <div className="px-4 py-3 text-sm text-slate-400">{noResultsText}</div>
                 : filtered.map((opt) => (
                   <button
                     key={opt}
@@ -228,9 +215,18 @@ function SimpleDropdown({ options, value, onChange, placeholder, icon }: {
 }
 
 // ─── Pay Input ────────────────────────────────────────────────────────────────
-function PayInput({ amount, payType, onAmountChange, onTypeChange }: {
+function PayInput({
+  amount,
+  payType,
+  onAmountChange,
+  onTypeChange,
+  payPlaceholder,
+  payDayWise,
+  payPerShift,
+}: {
   amount: string; payType: 'monthly' | 'yearly'
   onAmountChange: (v: string) => void; onTypeChange: (v: 'monthly' | 'yearly') => void
+  payPlaceholder: string; payDayWise: string; payPerShift: string
 }) {
   return (
     <div className="flex items-center border border-gray-200 rounded-xl bg-white hover:border-[#3F51B5]/40 focus-within:border-[#3F51B5] focus-within:shadow-[0_0_0_3px_rgba(63,81,181,0.1)] transition-all duration-200 overflow-hidden">
@@ -242,7 +238,7 @@ function PayInput({ amount, payType, onAmountChange, onTypeChange }: {
         min={0}
         value={amount}
         onChange={(e) => onAmountChange(e.target.value)}
-        placeholder="Tentative pay (optional)"
+        placeholder={payPlaceholder}
         className="flex-1 px-3 py-3 text-sm text-slate-800 placeholder-slate-400 bg-transparent outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
       />
       <div className="flex items-center gap-1 mr-3 bg-slate-100 rounded-lg p-1">
@@ -253,7 +249,7 @@ function PayInput({ amount, payType, onAmountChange, onTypeChange }: {
             onClick={() => onTypeChange(type)}
             className={`px-2.5 py-1 rounded-md text-[11px] font-semibold transition-all duration-200 ${payType === type ? 'bg-[#3F51B5] text-white shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}
           >
-            {type === 'monthly' ? 'Day wise' : 'Per Shift'}
+            {type === 'monthly' ? payDayWise : payPerShift}
           </button>
         ))}
       </div>
@@ -274,6 +270,7 @@ function Stat({ value, label }: { value: string; label: string }) {
 // ─── Main Component ───────────────────────────────────────────────────────────
 export function EmployerOnboardingForm() {
   const navigate = useNavigate()
+  const { t } = useLanguage()
 
   const [form, setForm] = useState<FormData>({
     employerName: '', jobTitle: '', jobDescription: '',
@@ -324,25 +321,25 @@ export function EmployerOnboardingForm() {
           <div>
             <div className="inline-flex items-center gap-2 bg-white/10 text-indigo-200 text-xs font-medium px-3 py-1.5 rounded-full mb-3">
               <FiBriefcase size={12} />
-              Employer Portal
+              {t.onboarding.employer.portalBadge}
             </div>
             <h2 className="text-white text-2xl font-bold leading-snug mb-3">
-              Post a job,<br />find the right fit.
+              {t.onboarding.employer.title}
             </h2>
             <p className="text-indigo-200 text-sm leading-relaxed">
-              Tell us about the role you're hiring for. We'll match you with the best candidates quickly.
+              {t.onboarding.employer.subtitle}
             </p>
             <div className="mt-6 grid grid-cols-2 gap-4">
-              <Stat value="1000+" label="Active job seekers" />
-              <Stat value="12h" label="Avg. first match" />
-              <Stat value="Free" label="To post your first job" />
-              <Stat value="Build Trust" label="Hire Again, form network" />
+              <Stat value="1000+" label={t.onboarding.employer.stats.activeSeekers} />
+              <Stat value="12h" label={t.onboarding.employer.stats.avgFirstMatch} />
+              <Stat value="Free" label={t.onboarding.employer.stats.freeToPost} />
+              <Stat value="Build Trust" label={t.onboarding.employer.stats.trust} />
             </div>
           </div>
 
           {/* Footer */}
           <div>
-            <p className="text-indigo-300 text-xs">Need help?</p>
+            <p className="text-indigo-300 text-xs">{t.onboarding.employer.needHelp}</p>
             <p className="text-amber-400 text-sm font-semibold mt-0.5">help@zupro.in</p>
           </div>
         </div>
@@ -357,12 +354,12 @@ export function EmployerOnboardingForm() {
           <div className="shrink-0 mb-3">
             <div className="flex items-center justify-between mb-3">
               <p className="text-xs text-slate-400 font-medium">
-                Step <span className="text-[#3F51B5] font-bold">1</span> of 2
+                {t.onboarding.employer.step} <span className="text-[#3F51B5] font-bold">1</span> {t.onboarding.employer.of} 2
               </p>
               <ProgressDots progress={progress} />
             </div>
-            <h3 className="text-lg font-bold text-slate-800 leading-tight">Job Details</h3>
-            <p className="text-sm text-slate-400 mt-0.5">Fill in the role you're looking to hire for.</p>
+            <h3 className="text-lg font-bold text-slate-800 leading-tight">{t.onboarding.employer.jobDetails}</h3>
+            <p className="text-sm text-slate-400 mt-0.5">{t.onboarding.employer.jobDetailsSubtitle}</p>
           </div>
 
           {/* Row 2 — scrollable fields */}
@@ -374,17 +371,19 @@ export function EmployerOnboardingForm() {
                   type="text"
                   value={form.employerName}
                   onChange={(e) => set('employerName')(e.target.value)}
-                  placeholder="Your name / Company name"
+                  placeholder={t.onboarding.employer.placeholders.employerName}
                   className="w-full px-3 py-3 text-sm text-slate-800 placeholder-slate-400 bg-transparent outline-none"
                 />
               </FieldBox>
 
               <SearchDropdown
-                options={JOB_TITLES}
+                options={[...t.onboarding.employer.options.jobTitles]}
                 value={form.jobTitle}
                 onChange={set('jobTitle')}
-                placeholder="Job Title"
-                subLabel="e.g. Software Engineer, Sales Executive"
+                placeholder={t.onboarding.employer.placeholders.jobTitle}
+                subLabel={t.onboarding.employer.placeholders.jobTitleSubLabel}
+                searchPlaceholder={t.onboarding.employer.placeholders.search}
+                noResultsText={t.onboarding.employer.placeholders.noResults}
                 icon={<FiBriefcase size={15} />}
               />
 
@@ -392,7 +391,7 @@ export function EmployerOnboardingForm() {
                 <textarea
                   value={form.jobDescription}
                   onChange={(e) => set('jobDescription')(e.target.value)}
-                  placeholder="Job description — responsibilities, requirements, perks…"
+                  placeholder={t.onboarding.employer.placeholders.jobDescription}
                   rows={2}
                   className="w-full px-3 py-3 text-sm text-slate-800 placeholder-slate-400 bg-transparent outline-none resize-none"
                 />
@@ -403,7 +402,7 @@ export function EmployerOnboardingForm() {
                   type="text"
                   value={form.jobLocation}
                   onChange={(e) => set('jobLocation')(e.target.value)}
-                  placeholder="Job location (e.g. Bangalore, Karnataka)"
+                  placeholder={t.onboarding.employer.placeholders.jobLocation}
                   className="w-full px-3 py-3 text-sm text-slate-800 placeholder-slate-400 bg-transparent outline-none"
                 />
               </FieldBox>
@@ -414,15 +413,18 @@ export function EmployerOnboardingForm() {
                   payType={form.payType}
                   onAmountChange={set('payAmount')}
                   onTypeChange={(v) => setForm((p) => ({ ...p, payType: v }))}
+                  payPlaceholder={t.onboarding.employer.placeholders.pay}
+                  payDayWise={t.onboarding.employer.placeholders.payDayWise}
+                  payPerShift={t.onboarding.employer.placeholders.payPerShift}
                 />
-                <p className="text-[11px] text-slate-400 mt-1 ml-1">Optional — leave blank if not decided yet</p>
+                <p className="text-[11px] text-slate-400 mt-1 ml-1">{t.onboarding.employer.placeholders.payHint}</p>
               </div>
 
               <SimpleDropdown
-                options={EDUCATION_LEVELS}
+                options={[...t.onboarding.employer.options.education]}
                 value={form.educationLevel}
                 onChange={set('educationLevel')}
-                placeholder="Minimum education level required"
+                placeholder={t.onboarding.employer.placeholders.education}
                 icon={<FiBookOpen size={15} />}
               />
 
@@ -442,7 +444,7 @@ export function EmployerOnboardingForm() {
                   : 'bg-slate-300 cursor-not-allowed'
               }`}
             >
-              Continue
+              {t.onboarding.employer.continue}
               <FiArrowRight size={18} />
             </motion.button>
           </div>

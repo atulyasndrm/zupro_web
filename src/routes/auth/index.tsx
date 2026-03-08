@@ -3,6 +3,7 @@ import { useEffect, useRef, useState } from 'react'
 import { OtpSection } from '../../features/auth/components/OtpSection'
 import { PhoneStep } from '../../features/auth/components/PhoneStep'
 import { RiShieldCheckLine } from 'react-icons/ri'
+import { useLanguage } from '../../features/i18n/language'
 
 export const Route = createFileRoute('/auth/')({
   component: RouteComponent,
@@ -19,6 +20,7 @@ function MobileStat({ value, label }: { value: string; label: string }) {
 }
 
 function RouteComponent() {
+  const { t } = useLanguage()
   const [phone, setPhone] = useState('')
   const [step, setStep] = useState<'phone' | 'otp'>('phone')
   const [isSending, setIsSending] = useState(false)
@@ -72,21 +74,21 @@ function RouteComponent() {
         {/* Headline + badge */}
         <div className="inline-flex items-center gap-1.5 bg-white/10 text-indigo-200 text-[11px] font-medium px-2.5 py-1 rounded-full mb-2">
           <RiShieldCheckLine size={11} />
-          Secure Login
+          {t.auth.mobileBadge}
         </div>
         <h2 className="text-white text-xl font-bold leading-snug mb-1">
-          Whether you're an employer, or seeking a job, we care for you.
+          {t.auth.mobileHeadline}
         </h2>
         <p className="text-indigo-300 text-xs leading-relaxed mb-5">
-          connecting employers to workers, faster than ever !
+          {t.auth.mobileSubtitle}
         </p>
 
         {/* Stats row */}
         <div className="grid grid-cols-4 gap-2 border-t border-white/10 pt-4">
-          <MobileStat value="1000+" label="Active jobs" />
-          <MobileStat value="12h" label="Avg. match" />
-          <MobileStat value="Free" label="To apply" />
-          <MobileStat value="Trusted" label="By employers" />
+          <MobileStat value="1000+" label={t.auth.stats.activeJobs} />
+          <MobileStat value="12h" label={t.auth.stats.avgMatch} />
+          <MobileStat value="Free" label={t.auth.stats.toApply} />
+          <MobileStat value="Trusted" label={t.auth.stats.trusted} />
         </div>
       </div>
 
@@ -110,8 +112,8 @@ function RouteComponent() {
                   <polyline points="20 6 9 17 4 12" />
                 </svg>
               </div>
-              <h2 className="text-2xl font-bold text-slate-800">You're in!</h2>
-              <p className="text-sm text-slate-500">Verified successfully. Redirecting...</p>
+              <h2 className="text-2xl font-bold text-slate-800">{t.auth.verifiedTitle}</h2>
+              <p className="text-sm text-slate-500">{t.auth.verifiedSubtitle}</p>
             </div>
 
           ) : (
@@ -124,13 +126,13 @@ function RouteComponent() {
                   <span className="ml-1 mb-0.5 inline-block w-2 h-2 rounded-full bg-primary" />
                 </div>
                 <p className="text-sm font-medium text-slate-500">
-                  {step === 'phone' ? 'Login / Sign Up' : 'Enter verification code'}
+                  {step === 'phone' ? t.auth.loginSignup : t.auth.enterVerificationCode}
                 </p>
               </div>
 
               {/* Mobile step label (brand already in banner) */}
               <p className="md:hidden text-xl font-semibold text-slate-500 mb-6 fade-up">
-                {step === 'phone' ? 'Login / Sign Up' : 'Enter verification code'}
+                {step === 'phone' ? t.auth.loginSignup : t.auth.enterVerificationCode}
               </p>
 
               {step === 'phone' && (
